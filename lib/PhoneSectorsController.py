@@ -8,39 +8,50 @@ class PhoneSectorsController(threading.Thread):
     may start more than one queries in parallel.
     """
 
-    def __init__(self, logger, name, location, address=""):
+    def __init__(self, logger, names, location, address=""):
         super().__init__()
+        self.multi = False
+        if len(names) > 1: self.multi = True
         self.logger = logger
-        self.name = name
+        self.names = names
         self.location = location
         self.address = address
-        self.filename = name + "_" + location
+        self.initFilename()
+
+    def initFilename(self):
+        if not self.multi: self.filename = self.names[0]
+        else: self.filename = "Range"
+        self.filename += "_" + self.location
         if self.address: self.filename += "_" + self.address
 
     def run(self):
         """
-        This method implements the actual query while defined as a unique thread.
+        This method implements the actual query defined as a unique thread.
         """
 
-        self.logger.log("New Search", "info")
+        append=False
+        for name in self.names:
+            self.logger.log("New Search for {}.".format(name), "info")
 
-        raw_data = QueryMaker.query(self.name, self.location, self.logger)
+            raw_data = QueryMaker.query(name, self.location, self.logger)
 
-        formatted_data = Miner.mine(raw_data)
-        if not raw_data:
-            self.logger.log("There are no results! No file will be generated!", "warning")
-            return
+            formatted_data = Miner.mine(raw_data)
+            if not raw_data and not self.multi:
+                self.logger.log("There are no results! No file will be generated!", "warning")
+                return
 
-        # Filter out data if and only if user has supplied an address.
-        # This statement could be omitted - it's used only for optimization.
-        if self.address:
-            self.logger.log("Filtering out records that don't match {}...".format(self.address), "info")
-            formatted_data = Filter.filter(formatted_data, self.address)
+            # Filter out data if and only if user has supplied an address.
+            # This statement could be omitted - it's used only for optimization.
+            if self.address:
+                self.logger.log("Filtering out records that don't match {}...".format(self.address), "info")
+                formatted_data = Filter.filter(formatted_data, self.address)
 
-        if not formatted_data:
-            self.logger.log("There are no results! No file will be generated!", "warning")
-            return
+            if not formatted_data and not self.multi:
+                self.logger.log("There are no results! No file will be generated!", "warning")
+                return
 
-        Exporter.exportToExcel(formatted_data, self.filename)
+            isExported = Exporter.exportToExcel(formatted_data, self.filename, append)
+            if not append and isExported:
+                append = not append
 
-        self.logger.log("File has been succesfully exported as \"{}.xlsx\"!".format(self.filename), "success")
+            self.logger.log("File has been succesfully exported as \"{}.xlsx\"!".format(self.filename), "success")
