@@ -1,0 +1,3 @@
+Phone Sectors is used to extract records based on specific search parameters. You may specify the desired parameters and have the data gathered in one Excel file.
+
+Both "Name" and "Location" fields should be at least 3 characters long. "Address" field may be left out blank, if address road is not necessary. However, if it's filled in, it can not contain specific numbers.

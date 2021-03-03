@@ -1,51 +1,17 @@
-from openpyxl import Workbook
-import json
+def purify(string):
+    """
+    This function simplifies the given string as much as possible and returns the
+    pure version of it. It is supposed to work basically for Greek words, but
+    other languages will not cause trouble. Its actual operation includes removing
+    all accents from given string, lowering all of its characters and removing
+    leading and trailing spaces.
+    It is useful when trying to compare two Greek words like "Γιώργος" and
+    "ΓΙΩΡΓΟΣ" - although they don't match, it might be useful to be consider them
+    equal.
+    - string: The string to be purified.
+    """
 
-#with open(f_out+".json", "w", encoding="utf-8") as file:
-#    file.write(json.dumps(raw_data, ensure_ascii=False, indent=2))
-
-def prepare(raw_data):
-    formattedRecords = []
-
-    for record in raw_data:
-        new_rec = {
-            "id": None,
-            "name": None,
-            "address": None,
-            "number": None
-            }
-
-        # INDEX
-        if "index" in record:
-            new_rec["id"] = record["index"]
-
-        # NAME
-        if "name" in record:
-            if "last" in record["name"] and record["name"]["last"]:
-                new_rec["name"] = record["name"]["last"]
-                if "middle" in record["name"] and record["name"]["middle"]:
-                    new_rec["name"] += " " + record["name"]["middle"]
-                if "first" in record["name"] and record["name"]["first"]:
-                    new_rec["name"] += " " + record["name"]["first"]
-            elif "first" in record["name"] and record["name"]["first"]:
-                new_rec["name"] = record["name"]["first"]
-
-        # ADDRESS
-        if "address" in record and record["address"]:
-            if "street1" in record["address"] and record["address"]["street1"]:
-                new_rec["address"] = record["address"]["street1"]
-                if "number1" in record["address"] and record["address"]["number1"]:
-                    new_rec["address"] += " " + record["address"]["number1"]
-        formattedRecords.append(new_rec)
-
-        # PHONES
-        if "phones" in record and record["phones"]:
-            if "number" in record["phones"][0] and record["phones"][0]["number"]:
-                new_rec["number"] = record["phones"][0]["number"]
-
-    return formattedRecords
-
-def purify(address):
+    # Map all possible characters with accents to their simplified version
     dict = {
         "ά": "α",
         "έ": "ε",
@@ -59,41 +25,66 @@ def purify(address):
         "ΰ": "υ",
         "ώ": "ω"
     }
+
     pure = ""
-    if address:
-        pure = address.lower().strip()
-        for letter in address:
-            if letter in dict.keys():
+
+    # Apply changes only to a non-empty string
+    if string:
+        pure = string.lower().strip()
+
+        for letter in string:
+            if string in dict.keys():
                 pure = pure.replace(letter, dict[letter])
+
     return pure
 
-def mineToExcel(raw_data, f_out, address="", logger=None):
-    data = prepare(raw_data)
-    if data:
-        workbook = Workbook()
-        sheet = workbook.active
+def mine(raw_data):
+    """
+    This function transforms an already strictly formatted set of .json data
+    into a useful list of records in a specific format.
+    - raw_data: The .json data as retrieved from 11888.gr to be formatted.
+    """
 
-        sheet["A1"] = "Αριθμός Εγγραφής"
-        sheet["B1"] = "Όνομα"
-        sheet["C1"] = "Διεύθυνση"
-        sheet["D1"] = "Τηλέφωνο"
+    # List of formatted data
+    records = []
 
-        row = 2
-        for record in data:
+    for record in raw_data:
 
-            if address:
-                if not purify(address) in purify(record["address"]):
-                    continue
+        # Create a templated empty dictionary-record
+        new_rec = {
+            "id": None,
+            "name": None,
+            "address": None,
+            "number": None
+            }
 
-            sheet["A"+str(row)] = record["id"]
-            sheet["B"+str(row)] = record["name"]
-            sheet["C"+str(row)] = record["address"]
-            sheet["D"+str(row)] = record["number"]
-            row += 1
-        workbook.save(filename=f_out+".xlsx")
+        # Isolate Index
+        if "index" in record:
+            new_rec["id"] = record["index"]
 
-        if logger: logger.log("Data have been successfully exported as {}.xlsx!".format(f_out), "success")
-        print("Data have been successfully exported as {}.xlsx!".format(f_out))
-    else:
-        if logger: logger.log("No data to be exported!", "warning")
-        print("There are no data to be exported!")
+        # Isolate Name
+        if "name" in record:
+            if "last" in record["name"] and record["name"]["last"]:
+                new_rec["name"] = record["name"]["last"]
+                if "middle" in record["name"] and record["name"]["middle"]:
+                    new_rec["name"] += " " + record["name"]["middle"]
+                if "first" in record["name"] and record["name"]["first"]:
+                    new_rec["name"] += " " + record["name"]["first"]
+            elif "first" in record["name"] and record["name"]["first"]:
+                new_rec["name"] = record["name"]["first"]
+
+        # Isolate Address
+        if "address" in record and record["address"]:
+            if "street1" in record["address"] and record["address"]["street1"]:
+                new_rec["address"] = record["address"]["street1"]
+                if "number1" in record["address"] and record["address"]["number1"]:
+                    new_rec["address"] += " " + record["address"]["number1"]
+
+        # Isolate Phone
+        if "phones" in record and record["phones"]:
+            if "number" in record["phones"][0] and record["phones"][0]["number"]:
+                new_rec["number"] = record["phones"][0]["number"]
+
+        records.append(new_rec)
+
+    return records

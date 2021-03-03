@@ -1,15 +1,24 @@
 import tkinter as tk
 from tkinter import scrolledtext as sText
-import sys
-
-import lib.queryMaker as qm
-import lib.miner as miner
 
 class GUI(tk.Frame):
-    def __init__(self, master=None):
-        tk.Frame.__init__(self, master)
-        self.master.title("Phone Sectors")
-        self.master.iconbitmap("./lib/icon.ico")
+    """
+    This class provides a simple graphical interface for user to interact with
+    PhoneSector's controller.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.setupWindow()
+        self.setupControls()
+        self.setupLogger()
+
+    def setupWindow(self):
+        """
+        This method initializes window related settings.
+        """
+
+        # Set dimensions and position
         width = 650
         height = 200
         screenX = self.master.winfo_screenwidth()
@@ -17,11 +26,18 @@ class GUI(tk.Frame):
         x = int(screenX/2 - width/2)
         y = int(screenY/2 - height/2)
         self.master.geometry("{}x{}+{}+{}".format(width, height, x, y))
+
+        # Other settings
+        self.master.title("Phone Sectors")
+        self.master.iconbitmap("./lib/res/icon.ico")
         self.master.resizable(False, False)
-        self.create_widgets()
 
-    def create_widgets(self):
+    def setupControls(self):
+        """
+        This method initializes the controller section of main window.
+        """
 
+        # Root frame
         controlFrame = tk.LabelFrame(self.master, text=" Search 11888.gr ")
 
         # Name Field
@@ -48,8 +64,8 @@ class GUI(tk.Frame):
         self.address_entry.bind("<Return>", self.go)
         self.address_entry.grid(row=2, column=1)
 
+        # Buttons sub-frame
         buttonsFrame = tk.Frame(controlFrame)
-        
 
         # Help Button
         self.help_button = tk.Button(buttonsFrame, text="Help")
@@ -62,13 +78,18 @@ class GUI(tk.Frame):
         self.go_button.configure(width=10)
         self.go_button.bind("<Button-1>", self.go)
         self.go_button.pack(side="right", padx=3)
-        #self.go_button.grid(row=3, column=1, sticky="E", pady=5)
 
+        # Packing up
         buttonsFrame.grid(row=3, column=0, columnspan=2, pady=10)
-
         controlFrame.pack(side="left", expand=1,  ipadx=5, padx=10)
 
+    def setupLogger(self):
+        """
+        This method initializes the logger window, which is used to display
+        feedback messages to user.
+        """
 
+        # Root frame
         logFrame = tk.LabelFrame(self.master, text="Log")
 
         # Logger
@@ -80,75 +101,70 @@ class GUI(tk.Frame):
         self.logger.configure(state="disabled", wrap="word")
         self.logger.pack(expand=1, fill="both")
 
+        # Packing up
         logFrame.pack(side="right", expand=1, fill="both", pady=10, padx=10)
 
     def help(self, event):
-        help_msg = "Phone Sectors is used to extract records based on specific \
-parameters.\n\nBoth \"Name\" and \"Location\" fields should be at least 3 \
-characters long. \"Address\" field may be left out blank, if address road is not \
-necessary. However, if it's filled in, it can not contain specific numbers."
-        self.log(help_msg, "info")
+        """
+        This method is used to display the help message in logger. The help
+        message can be found and/ or altered in "./lib/res/help_msg.txt".
+        """
+
+        try:
+            with open("./lib/res/help_msg.txt", "r", encoding="utf-8") as f_in:
+                help_msg = f_in.read().strip()
+            self.log(help_msg, "info")
+        except:
+            self.log("Help Message couldn't be loaded due to some error!", "error")
 
     def go(self, event):
+        """
+        This method is used to initialize the go button, which triggers the
+        main search and export routine. In that stage the input is being checked
+        whether they comply to certain validity rules.
+        """
+
         name = self.name.get()
         location = self.location.get()
         address = self.address.get()
 
+        # Validity rules
         if not len(name)>=3:
             self.log("Name should be at least 3 characters long!", "error")
-            print("Name should be at least 3 characters long!")
             return
         if not len(location)>=3:
             self.log("Location should be at least 3 characters long!", "error")
-            print("Location should be at least 3 characters long!")
             return
         if address:
             if not address.isalpha():
                 self.log("Address can't contain numbers!", "error")
-                print("Address can not contain numbers!")
                 return
 
+        # Clear entries only if the query is about to begin
         self.name_entry.delete(0, "end")
         self.location_entry.delete(0, "end")
         self.address_entry.delete(0, "end")
-        extract(name, location, address, self)
+
+        extract(name, location, address)
 
     def log(self, message, fatality="info"):
+        """
+        This method displays given message to logger screen, in appropriate color.
+        - message: The message to be displayed.
+        - fatality: The importance of the message. It can be one of
+            {"success", "info", "warning", "error"}.
+        """
+
+        # Enable editing
         self.logger.configure(state="normal")
+
+        # Insert message to logger and place viewport at very end of logger.
         self.logger.insert("end", message, fatality)
         self.logger.insert("end", "\n---\n")
-        self.logger.configure(state="disabled")
         self.logger.see("end")
 
-def CLI():
-    while True:
-        ans = input("Copy from your browser the NAME KEY and paste it here: ")
-        if len(ans) >= 3:
-            name = ans
-            break
-        else: print("Please insert a NAME KEY longer than 3 characters")
-
-    while True:
-        ans = input("Copy from your browser the LOCATION KEY and paste it here: ")
-        if ans != "":
-            location = ans
-            break
-        else: print("Make sure you copy the LOCATION KEY")
-
-    extract(name, location)
-
-def extract(name, location, address="", logger=None):
-    filename = name + "_" + location
-    if address: filename += "_" + address
-    data = qm.query(name, location, logger)
-    miner.mineToExcel(data, filename, address, logger)
+        # Disable editing
+        self.logger.configure(state="disabled")
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        if "--cli" in sys.argv:
-            CLI()
-            input("Press <enter> to exit...")
-            exit()
-    else:
-        app = GUI()
-        app.mainloop()
+    GUI().mainloop()
