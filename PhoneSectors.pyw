@@ -148,7 +148,7 @@ class GUI(tk.Frame):
         self.location_entry.delete(0, "end")
         self.address_entry.delete(0, "end")
 
-        session = PSC.PhoneSectorsController(name, location, address)
+        session = PSC.PhoneSectorsController(self, name, location, address)
         session.start()
 
     def log(self, message, fatality="info"):

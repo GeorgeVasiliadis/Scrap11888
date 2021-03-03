@@ -1,6 +1,6 @@
 import requests
 
-def findPageCount(name, location):
+def findPageCount(name, location, logger):
     """
     This function queries and retrieves the number of pages of 11888.gr results
     for the specific search parameters. If the parameters are faulty of lead to
@@ -13,7 +13,7 @@ def findPageCount(name, location):
     response = requests.get("https://www.11888.gr/search/white_pages/?&query={}&location={}".format(name, location))
 
     if not (response.status_code == requests.codes.ok):
-        print("An error has occured while trying to calculate count of records from 11888.gr")
+        logger.log("An error has occured while trying to calculate count of records from 11888.gr", "error")
     else:
         if "data" in response.json():
             if "total_pages" in response.json()["data"]:
@@ -25,7 +25,7 @@ def findPageCount(name, location):
 # returned).
 # This could possibly be optimized to return all data in one single page.
 # Consider engineering "&records=N" to query.
-def query(name, location):
+def query(name, location, logger):
     """
     This function queries the name dictionary of 11888.gr for a specific name, in
     a specific location. It returns a .json formatted dataset containing all
@@ -37,17 +37,22 @@ def query(name, location):
 
     # Set of data retrieved from each page, combined in one list
     records = []
-    recordCount = findPageCount(name, location)
+    recordCount = findPageCount(name, location, logger)
+
+    if recordCount:
+        logger.log("Pages to be fetched: {}".format(recordCount), "warning")
 
     # Query each one of the pages of 11888.gr and retrieve the contained .json data.
     for page in range(recordCount):
-        print("Working on page {}...".format(page))
+
+        logger.log("Working on page {}...".format(page), "info")
+
         response = requests.get("https://www.11888.gr/search/white_pages/?&query={}&location={}&page={}".format(name, location, page))
 
         if not (response.status_code == requests.codes.ok):
-            print("An error has occured while trying to fetch data from 11888.gr")
+            logger.log("An error has occured while trying to fetch data from 11888.gr", "error")
         else:
-            print("Data have been successfully fetched!")
+            logger.log("Data have been successfully fetched!", "info")
             if "data" in response.json():
                 if "results" in response.json()["data"]:
                     for record in response.json()["data"]["results"]:
