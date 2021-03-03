@@ -1,10 +1,12 @@
 import tkinter as tk
-from tkinter import scrolledtext as sText
+from tkinter import scrolledtext
+
+import lib.PhoneSectorsController as PSC
 
 class GUI(tk.Frame):
     """
     This class provides a simple graphical interface for user to interact with
-    PhoneSector's controller.
+    PhoneSectors' controller.
     """
 
     def __init__(self):
@@ -45,6 +47,7 @@ class GUI(tk.Frame):
         name_label.grid(row=0, column=0, sticky="E")
         self.name = tk.StringVar()
         self.name_entry = tk.Entry(controlFrame, textvariable=self.name)
+        self.name_entry.focus_set()
         self.name_entry.bind("<Return>", self.go)
         self.name_entry.grid(row=0, column=1)
 
@@ -93,7 +96,7 @@ class GUI(tk.Frame):
         logFrame = tk.LabelFrame(self.master, text="Log")
 
         # Logger
-        self.logger = sText.ScrolledText(logFrame)
+        self.logger = scrolledtext.ScrolledText(logFrame)
         self.logger.tag_config("success", foreground="green")
         self.logger.tag_config("warning", foreground="orange")
         self.logger.tag_config("info", foreground="grey")
@@ -145,7 +148,8 @@ class GUI(tk.Frame):
         self.location_entry.delete(0, "end")
         self.address_entry.delete(0, "end")
 
-        extract(name, location, address)
+        session = PSC.PhoneSectorsController(name, location, address)
+        session.start()
 
     def log(self, message, fatality="info"):
         """
