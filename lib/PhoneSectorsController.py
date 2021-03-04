@@ -31,27 +31,34 @@ class PhoneSectorsController(threading.Thread):
 
         append=False
         for name in self.names:
-            self.logger.log("New Search for {}.".format(name), "info")
+            if name:
+                self.logger.log("New Search for {}.".format(name), "info")
 
-            raw_data = QueryMaker.query(name, self.location, self.logger)
+                raw_data = QueryMaker.query(name, self.location, self.logger)
 
-            formatted_data = Miner.mine(raw_data)
-            if not raw_data and not self.multi:
-                self.logger.log("There are no results! No file will be generated!", "warning")
-                return
+                formatted_data = Miner.mine(raw_data)
+                if not raw_data and not self.multi:
+                    self.logger.log("There are no results! No file will be generated!", "warning")
+                    return
 
-            # Filter out data if and only if user has supplied an address.
-            # This statement could be omitted - it's used only for optimization.
-            if self.address:
-                self.logger.log("Filtering out records that don't match {}...".format(self.address), "info")
-                formatted_data = Filter.filter(formatted_data, self.address)
+                # Filter out data if and only if user has supplied an address.
+                # This statement could be omitted - it's used only for optimization.
+                if self.address:
+                    self.logger.log("Filtering out records that don't match {}...".format(self.address), "info")
+                    formatted_data = Filter.filter(formatted_data, self.address)
 
-            if not formatted_data and not self.multi:
-                self.logger.log("There are no results! No file will be generated!", "warning")
-                return
+                if not formatted_data and not self.multi:
+                    self.logger.log("There are no results! No file will be generated!", "warning")
+                    return
 
-            isExported = Exporter.exportToExcel(formatted_data, self.filename, append)
-            if not append and isExported:
-                append = not append
+                isExported = Exporter.exportToExcel(formatted_data, self.filename, append)
+                if not append and isExported:
+                    append = not append
 
+            else:
+                self.logger.log("Empty name.", "warning")
+
+        if append:
             self.logger.log("File has been succesfully exported as \"{}.xlsx\"!".format(self.filename), "success")
+        else:
+            self.logger.log("No file was created. There are no data to be exported.", "warning")

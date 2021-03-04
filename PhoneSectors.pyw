@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
 from tkinter.filedialog import askopenfilename
-
 from threading import Thread
 
 import lib.PhoneSectorsController as PSC
