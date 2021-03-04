@@ -198,7 +198,7 @@ class GUI(tk.Frame):
     # Just ignore X(
     def aux(self):
         self.file_option.select()
-        self.filename.set(askopenfilename(filetypes=[("Excel files", ".xlsx .xls")]))
+        self.filename.set(askopenfilename(filetypes=[("Excel files", ".xlsx")]))
 
     def selectFile(self, event):
         self.file_option.select()

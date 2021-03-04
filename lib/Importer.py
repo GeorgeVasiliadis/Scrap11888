@@ -6,7 +6,7 @@ def importNames(filename, logger):
     try:
         workbook = openpyxl.load_workbook(filename)
         sheet = workbook.active
-        
+
         for i in range(1,sheet.max_row+1):
             names.append(sheet.cell(row=i, column=1).value)
     except:
