@@ -1,5 +1,7 @@
 import threading
-from . import QueryMaker, Miner, Exporter, Filter
+
+from .Fetching import QueryMaker
+from .DataManagement import  Miner, Exporter, Filter
 
 class PhoneSectorsController(threading.Thread):
     """

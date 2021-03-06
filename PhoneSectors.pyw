@@ -4,7 +4,7 @@ from tkinter.filedialog import askopenfilename
 from threading import Thread
 
 import lib.PhoneSectorsController as PSC
-import lib.Importer as Importer
+import lib.DataManagement.Importer as Importer
 
 class GUI(tk.Frame):
     """
