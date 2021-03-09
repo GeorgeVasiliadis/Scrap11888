@@ -1,4 +1,15 @@
 import requests
+import concurrent.futures
+import threading
+
+from lib.Decorators.Debugging import timeMe
+
+class QueryMaker(threading.Thread):
+    def __init__(self, name, location):
+        super().__init__(self)
+        self.total_pages = findPageCount(name, location)
+
+
 
 def findPageCount(name, location, logger):
     """
@@ -21,10 +32,25 @@ def findPageCount(name, location, logger):
 
     return count
 
+def thready(name, location, page, records, logger):
+    logger.log("Working on page {}...".format(page), "info")
+
+    response = requests.get("https://www.11888.gr/search/white_pages/?&query={}&location={}&page={}".format(name, location, page))
+
+    if not (response.status_code == requests.codes.ok):
+        logger.log("An error has occured while trying to fetch data from 11888.gr", "error")
+    else:
+        logger.log("Data have been successfully fetched!", "info")
+        if "data" in response.json():
+            if "results" in response.json()["data"]:
+                for record in response.json()["data"]["results"]:
+                    records.append(record)
+
 # TODO: this function makes N queries to 11888.gr (N = the number of pages
 # returned).
 # This could possibly be optimized to return all data in one single page.
 # Consider engineering "&records=N" to query.
+#@timeMe
 def query(name, location, logger):
     """
     This function queries the name dictionary of 11888.gr for a specific name, in
@@ -43,19 +69,25 @@ def query(name, location, logger):
         logger.log("Pages to be fetched: {}".format(recordCount), "warning")
 
     # Query each one of the pages of 11888.gr and retrieve the contained .json data.
-    for page in range(recordCount):
+    #for page in range(recordCount):
 
-        logger.log("Working on page {}...".format(page), "info")
+        # thready(name, location, page, records, logger)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+        for page in range(recordCount):
+            executor.submit(thready, name, location, page, records, logger)
 
-        response = requests.get("https://www.11888.gr/search/white_pages/?&query={}&location={}&page={}".format(name, location, page))
-
-        if not (response.status_code == requests.codes.ok):
-            logger.log("An error has occured while trying to fetch data from 11888.gr", "error")
-        else:
-            logger.log("Data have been successfully fetched!", "info")
-            if "data" in response.json():
-                if "results" in response.json()["data"]:
-                    for record in response.json()["data"]["results"]:
-                        records.append(record)
+        # Depricated Code
+        # logger.log("Working on page {}...".format(page), "info")
+        #
+        # response = requests.get("https://www.11888.gr/search/white_pages/?&query={}&location={}&page={}".format(name, location, page))
+        #
+        # if not (response.status_code == requests.codes.ok):
+        #     logger.log("An error has occured while trying to fetch data from 11888.gr", "error")
+        # else:
+        #     logger.log("Data have been successfully fetched!", "info")
+        #     if "data" in response.json():
+        #         if "results" in response.json()["data"]:
+        #             for record in response.json()["data"]["results"]:
+        #                 records.append(record)
 
     return records
