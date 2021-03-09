@@ -1,10 +1,9 @@
 import requests
 import concurrent.futures
-import threading
 
 from lib.Decorators.Debugging import timeMe
 
-class QueryMaker(threading.Thread):
+class QueryMaker():
     def __init__(self, name, location):
         super().__init__(self)
         self.total_pages = findPageCount(name, location)
