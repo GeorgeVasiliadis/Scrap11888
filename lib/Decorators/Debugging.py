@@ -1,6 +1,8 @@
 import time
 
 def timeMe(func):
+    """Time the total runtime of wrapped function."""
+    
     def time_wrapper(*args, **kwargs):
         t1 = time.time()
         ret = func(*args, **kwargs)
