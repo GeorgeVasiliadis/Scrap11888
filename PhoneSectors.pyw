@@ -1,5 +1,4 @@
 import threading
-from threading import Thread
 import tkinter as tk
 from tkinter import scrolledtext
 from tkinter.filedialog import askopenfilename
@@ -193,7 +192,7 @@ class GUI(tk.Frame):
 
     #TODO focus radio button
     def chooseFile(self, event):
-        thread = Thread(target=self.aux)
+        thread = threading.Thread(target=self.aux)
         thread.start()
 
     # Workaround to make file button get back up after being pressed.
