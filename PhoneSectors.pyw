@@ -1,7 +1,8 @@
+import threading
+from threading import Thread
 import tkinter as tk
 from tkinter import scrolledtext
 from tkinter.filedialog import askopenfilename
-from threading import Thread
 
 import lib.PhoneSectorsController as PSC
 import lib.DataManagement.Importer as Importer
@@ -114,6 +115,7 @@ class GUI(tk.Frame):
         This method initializes the logger window, which is used to display
         feedback messages to user.
         """
+        self.logLock = threading.Lock()
 
         # Root frame
         logFrame = tk.LabelFrame(self.master, text="Log")
@@ -214,6 +216,8 @@ class GUI(tk.Frame):
             {"success", "info", "warning", "error"}.
         """
 
+        self.logLock.acquire()
+
         # Enable editing
         self.logger.configure(state="normal")
 
@@ -224,6 +228,8 @@ class GUI(tk.Frame):
 
         # Disable editing
         self.logger.configure(state="disabled")
+
+        self.logLock.release()
 
 if __name__ == "__main__":
     GUI().mainloop()
