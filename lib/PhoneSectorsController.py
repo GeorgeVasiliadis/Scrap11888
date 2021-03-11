@@ -1,4 +1,5 @@
 import threading
+import concurrent.futures
 
 from .Fetching import QueryMaker
 from .DataManagement import  Miner, Exporter, Filter
@@ -21,46 +22,54 @@ class PhoneSectorsController(threading.Thread):
         self.initFilename()
 
     def initFilename(self):
-        if not self.multi: self.filename = self.names[0]
-        else: self.filename = "Range"
+        # if not self.multi: self.filename = self.names[0]
+        # else: self.filename = "Range"
+        # self.filename += "_" + self.location
+        # if self.address: self.filename += "_" + self.address
+        self.filename = self.names[0]
         self.filename += "_" + self.location
-        if self.address: self.filename += "_" + self.address
 
+    from lib.Decorators.Debugging import timeMe
+
+    def thready(name, location, address, multi, logger):
+        if name:
+            logger.log("New Search for {}.".format(name), "info")
+
+            raw_data = QueryMaker.query(name, location, logger)
+
+            formatted_data = Miner.mine(raw_data)
+            if not raw_data and not multi:
+                logger.log("There are no results! No file will be generated!", "warning")
+                return
+
+            # Filter out data if and only if user has supplied an address.
+            # This statement could be omitted - it's used only for optimization.
+            if address:
+                logger.log("Filtering out records that don't match {}...".format(address), "info")
+                formatted_data = Filter.filter(formatted_data, address)
+
+            if not formatted_data and not multi:
+                logger.log("There are no results! No file will be generated!", "warning")
+                return
+
+            filename = f"{name}_{location}"
+            isExported = Exporter.exportToExcel(formatted_data, filename)
+
+        else:
+            logger.log("Empty name.", "warning")
+
+    @timeMe
     def run(self):
         """
         This method implements the actual query defined as a unique thread.
         """
 
-        append=False
-        for name in self.names:
-            if name:
-                self.logger.log("New Search for {}.".format(name), "info")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=45) as executor:
+            for name in self.names:
+                executor.submit(PhoneSectorsController.thready, name, self.location, self.address, self.multi, self.logger)
 
-                raw_data = QueryMaker.query(name, self.location, self.logger)
-
-                formatted_data = Miner.mine(raw_data)
-                if not raw_data and not self.multi:
-                    self.logger.log("There are no results! No file will be generated!", "warning")
-                    return
-
-                # Filter out data if and only if user has supplied an address.
-                # This statement could be omitted - it's used only for optimization.
-                if self.address:
-                    self.logger.log("Filtering out records that don't match {}...".format(self.address), "info")
-                    formatted_data = Filter.filter(formatted_data, self.address)
-
-                if not formatted_data and not self.multi:
-                    self.logger.log("There are no results! No file will be generated!", "warning")
-                    return
-
-                isExported = Exporter.exportToExcel(formatted_data, self.filename, append)
-                if not append and isExported:
-                    append = not append
-
-            else:
-                self.logger.log("Empty name.", "warning")
-
-        if append:
-            self.logger.log("File has been succesfully exported as \"{}.xlsx\"!".format(self.filename), "success")
-        else:
-            self.logger.log("No file was created. There are no data to be exported.", "warning")
+        self.logger.log("DONE", "info")
+        # if isExported:
+        #     self.logger.log("File has been succesfully exported as \"{}.xlsx\"!".format(self.filename), "success")
+        # else:
+        #     self.logger.log("No file was created. There are no data to be exported.", "warning")
