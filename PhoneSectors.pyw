@@ -183,6 +183,7 @@ class GUI(tk.Frame):
                 return
 
         # Clear entries only if the query is about to begin
+        self.filename_entry.delete(0, "end")
         self.name_entry.delete(0, "end")
         self.location_entry.delete(0, "end")
         self.address_entry.delete(0, "end")

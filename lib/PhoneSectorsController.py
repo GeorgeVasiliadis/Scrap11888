@@ -2,7 +2,7 @@ import threading
 import concurrent.futures
 
 from .Fetching import QueryMaker
-from .DataManagement import  Miner, Exporter, Filter
+from .DataManagement import  Miner, Exporter, Filter, Cacher
 
 class PhoneSectorsController(threading.Thread):
     """
@@ -35,12 +35,16 @@ class PhoneSectorsController(threading.Thread):
         if name:
             logger.log("New Search for {}.".format(name), "info")
 
-            raw_data = QueryMaker.query(name, location, logger)
+            formatted_data = Cacher.cacheOut(location, name)
+            if not formatted_data:
 
-            formatted_data = Miner.mine(raw_data)
-            if not raw_data and not multi:
-                logger.log("There are no results! No file will be generated!", "warning")
-                return
+                raw_data = QueryMaker.query(name, location, logger)
+
+                formatted_data = Miner.mine(raw_data)
+                if not raw_data and not multi:
+                    logger.log("There are no results! No file will be generated!", "warning")
+                    return
+                Cacher.cacheIn(location, name, formatted_data)
 
             # Filter out data if and only if user has supplied an address.
             # This statement could be omitted - it's used only for optimization.
