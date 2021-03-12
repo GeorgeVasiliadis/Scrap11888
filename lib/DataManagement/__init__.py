@@ -12,6 +12,7 @@ def purify(string):
     """
 
     # Map all possible characters with accents to their simplified version
+    # 'ς' is included as exception because `.lower()` won't work in that manner.
     dict = {
         "ά": "α",
         "έ": "ε",
@@ -23,7 +24,8 @@ def purify(string):
         "ύ": "υ",
         "ϋ": "υ",
         "ΰ": "υ",
-        "ώ": "ω"
+        "ώ": "ω",
+        "ς": "σ"
     }
 
     pure = ""

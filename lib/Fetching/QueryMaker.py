@@ -86,7 +86,6 @@ def query(name, location, logger):
     # Query each one of the pages of 11888.gr and retrieve the contained .json data.
     with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
         for page in range(recordCount):
-
             executor.submit(thready, name, location, page, records, logger)
 
     return records

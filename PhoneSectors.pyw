@@ -163,15 +163,15 @@ class GUI(tk.Frame):
                 return
             names = Importer.importNames(filename, self)
         elif nameSource == GUI.FROM_NAME:
-            name = self.name.get()
+            name = self.name.get().strip()
             if not len(name)>=3:
                 self.log("Name should be at least 3 characters long!", "error")
                 return
             names = [name]
         else: self.log("Fatal Internal Error!", "error")
 
-        location = self.location.get()
-        address = self.address.get()
+        location = self.location.get().strip()
+        address = self.address.get().strip()
 
         # Validity rules
         if not len(location)>=3:

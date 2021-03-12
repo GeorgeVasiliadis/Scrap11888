@@ -13,37 +13,30 @@ class PhoneSectorsController(threading.Thread):
 
     def __init__(self, logger, names, location, address=""):
         super().__init__()
-        self.multi = False
         if len(names) > 1: self.multi = True
+        else: self.multi = False
         self.logger = logger
         self.names = names
         self.location = location
         self.address = address
-        self.initFilename()
-
-    def initFilename(self):
-        # if not self.multi: self.filename = self.names[0]
-        # else: self.filename = "Range"
-        # self.filename += "_" + self.location
-        # if self.address: self.filename += "_" + self.address
-        self.filename = self.names[0]
-        self.filename += "_" + self.location
-
-    from lib.Decorators.Debugging import timeMe
 
     def thready(name, location, address, multi, logger):
         if name:
-            logger.log("New Search for {}.".format(name), "info")
 
+            # Try to find requested data in cache
             formatted_data = Cacher.cacheOut(location, name)
+
+            # If requested data are not cached, fetch them
             if not formatted_data:
-
+                logger.log("New Search for {}.".format(name), "info")
                 raw_data = QueryMaker.query(name, location, logger)
-
                 formatted_data = Miner.mine(raw_data)
-                if not raw_data and not multi:
+
+                if not formatted_data and not multi:
                     logger.log("There are no results! No file will be generated!", "warning")
                     return
+
+                # Cache the fetched, well-formatted data
                 Cacher.cacheIn(location, name, formatted_data)
 
             # Filter out data if and only if user has supplied an address.
@@ -56,12 +49,19 @@ class PhoneSectorsController(threading.Thread):
                 logger.log("There are no results! No file will be generated!", "warning")
                 return
 
-            filename = f"{name}_{location}"
+            filename = defineFilename(name, location, address)
+
             isExported = Exporter.exportToExcel(formatted_data, filename)
+
+            if isExported:
+                logger.log(f"File \"{filename}.xlsx\" has been created!", "success")
+            else:
+                logger.log("No file was created. There are no data to be exported.", "warning")
 
         else:
             logger.log("Empty name.", "warning")
 
+    from lib.Decorators.Debugging import timeMe
     @timeMe
     def run(self):
         """
@@ -73,7 +73,9 @@ class PhoneSectorsController(threading.Thread):
                 executor.submit(PhoneSectorsController.thready, name, self.location, self.address, self.multi, self.logger)
 
         self.logger.log("DONE", "info")
-        # if isExported:
-        #     self.logger.log("File has been succesfully exported as \"{}.xlsx\"!".format(self.filename), "success")
-        # else:
-        #     self.logger.log("No file was created. There are no data to be exported.", "warning")
+
+
+def defineFilename(name, location, address):
+    filename = name + "_" + location
+    if address: filename += "_" + address
+    return filename
