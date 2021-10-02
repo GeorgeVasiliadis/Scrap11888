@@ -1,10 +1,19 @@
+import os
 import threading
+
 import tkinter as tk
 from tkinter import scrolledtext
 from tkinter.filedialog import askopenfilename
+from tkinter import _tkinter
 
-import lib.PhoneSectorsController as PSC
-import lib.DataManagement.Importer as Importer
+from .lib import PhoneSectorsController as PSC
+from .lib.DataManagement import Importer
+
+ROOT_DIR = os.path.dirname(__file__)
+
+def staticPath(relativePath):
+    path = os.path.join(ROOT_DIR, relativePath)
+    return os.path.normpath(path)
 
 class GUI(tk.Frame):
     """
@@ -38,7 +47,11 @@ class GUI(tk.Frame):
 
         # Other settings
         self.master.title("Phone Sectors")
-        self.master.iconbitmap("./lib/res/icon.ico")
+        path = staticPath("res/icon.ico")
+        try:
+            self.master.iconbitmap(path)
+        except _tkinter.TclError:
+            print("Icon couldn't be loaded due to a Tcl image-manipulation error!")
         self.master.resizable(False, False)
 
     def setupControls(self):
@@ -134,11 +147,12 @@ class GUI(tk.Frame):
     def help(self, event):
         """
         This method is used to display the help message in logger. The help
-        message can be found and/ or altered in "./lib/res/help_msg.txt".
+        message can be found and/ or altered in "./res/help_msg.txt".
         """
 
         try:
-            with open("./lib/res/help_msg.txt", "r", encoding="utf-8") as f_in:
+            path = staticPath("res/help_msg.txt")
+            with open(path, "r", encoding="utf-8") as f_in:
                 help_msg = f_in.read().strip()
             self.log(help_msg, "info")
         except:
@@ -231,5 +245,8 @@ class GUI(tk.Frame):
 
         self.logLock.release()
 
-if __name__ == "__main__":
+def main():
     GUI().mainloop()
+
+if __name__ == "__main__":
+    main()

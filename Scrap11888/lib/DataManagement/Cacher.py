@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from lib.DataManagement.__init__ import purify
+from .Utils import purify
 
 def cacheIn(dir, name, data):
     """

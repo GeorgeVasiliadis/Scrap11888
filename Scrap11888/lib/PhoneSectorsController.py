@@ -61,7 +61,7 @@ class PhoneSectorsController(threading.Thread):
         else:
             logger.log("Empty name.", "warning")
 
-    from lib.Decorators.Debugging import timeMe
+    from .Decorators.Debugging import timeMe
     @timeMe
     def run(self):
         """
@@ -73,7 +73,6 @@ class PhoneSectorsController(threading.Thread):
                 executor.submit(PhoneSectorsController.thready, name, self.location, self.address, self.multi, self.logger)
 
         self.logger.log("DONE", "info")
-
 
 def defineFilename(name, location, address):
     filename = name + "_" + location

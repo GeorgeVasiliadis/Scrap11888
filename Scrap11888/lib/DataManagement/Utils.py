@@ -6,7 +6,7 @@ def purify(string):
     all accents from given string, lowering all of its characters and removing
     leading and trailing spaces.
     It is useful when trying to compare two Greek words like "Γιώργος" and
-    "ΓΙΩΡΓΟΣ" - although they don't match, it might be useful to be consider them
+    "ΓΙΩΡΓΟΣ" - although they don't match, it might be useful to consider them
     equal.
     - string: The string to be purified.
     """

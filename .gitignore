@@ -1,3 +1,4 @@
 *pycache*
 *.xlsx
 cache
+dist/

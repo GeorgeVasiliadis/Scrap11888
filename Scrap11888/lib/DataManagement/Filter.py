@@ -1,4 +1,4 @@
-from lib.DataManagement.__init__ import purify
+from .Utils import purify
 
 def filter(data, key):
     """
