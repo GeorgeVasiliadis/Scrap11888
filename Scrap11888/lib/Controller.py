@@ -4,9 +4,9 @@ import concurrent.futures
 from .Fetching import QueryMaker
 from .DataManagement import  Miner, Exporter, Filter, Cacher
 
-class PhoneSectorsController(threading.Thread):
+class Controller(threading.Thread):
     """
-    This class is used to define the controller entity of Phone Sectors. It
+    This class is used to define the controller entity of Scrap11888. It
     derives from Thread class in order to support more demanding queries. A user
     may start more than one queries in parallel.
     """
@@ -70,7 +70,7 @@ class PhoneSectorsController(threading.Thread):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=45) as executor:
             for name in self.names:
-                executor.submit(PhoneSectorsController.thready, name, self.location, self.address, self.multi, self.logger)
+                executor.submit(Controller.thready, name, self.location, self.address, self.multi, self.logger)
 
         self.logger.log("DONE", "info")
 

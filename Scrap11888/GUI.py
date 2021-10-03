@@ -6,7 +6,7 @@ from tkinter import scrolledtext
 from tkinter.filedialog import askopenfilename
 from tkinter import _tkinter
 
-from .lib import PhoneSectorsController as PSC
+from .lib import Controller
 from .lib.DataManagement import Importer
 
 ROOT_DIR = os.path.dirname(__file__)
@@ -18,7 +18,7 @@ def staticPath(relativePath):
 class GUI(tk.Frame):
     """
     This class provides a simple graphical interface for user to interact with
-    PhoneSectors' controller.
+    Scrap11888's controller.
     """
 
     FROM_NONE = 0
@@ -46,7 +46,7 @@ class GUI(tk.Frame):
         self.master.geometry("{}x{}+{}+{}".format(width, height, x, y))
 
         # Other settings
-        self.master.title("Phone Sectors")
+        self.master.title("Scrap11888")
         path = staticPath("res/icon.ico")
         try:
             self.master.iconbitmap(path)
@@ -202,7 +202,7 @@ class GUI(tk.Frame):
         self.location_entry.delete(0, "end")
         self.address_entry.delete(0, "end")
 
-        session = PSC.PhoneSectorsController(self, names, location, address)
+        session = Controller.Controller(self, names, location, address)
         session.start()
 
     #TODO focus radio button

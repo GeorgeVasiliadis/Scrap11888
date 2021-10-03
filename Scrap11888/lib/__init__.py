@@ -1,2 +1,2 @@
-from . import PhoneSectorsController
+from . import Controller
 from . import DataManagement
