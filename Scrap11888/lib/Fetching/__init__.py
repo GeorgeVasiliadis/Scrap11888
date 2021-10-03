@@ -1,0 +1,1 @@
+from .QueryMaker import fetchPage

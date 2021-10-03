@@ -2,12 +2,13 @@ def purify(string):
     """
     This function simplifies the given string as much as possible and returns the
     pure version of it. It is supposed to work basically for Greek words, but
-    other languages will not cause trouble. Its actual operation includes removing
+    other languages shouldn't cause trouble. Its actual operation includes removing
     all accents from given string, lowering all of its characters and removing
     leading and trailing spaces.
     It is useful when trying to compare two Greek words like "Γιώργος" and
-    "ΓΙΩΡΓΟΣ" - although they don't match, it might be useful to consider them
-    equal.
+    "  ΓΙΩΡΓΟΣ " - although they don't match in an absolute way, it might be
+    useful to consider them equal.
+
     - string: The string to be purified.
     """
 

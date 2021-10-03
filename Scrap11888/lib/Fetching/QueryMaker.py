@@ -1,8 +1,6 @@
 import requests
 import concurrent.futures
 
-__all__ = ["query", "findPageCount"]
-
 def fetchPage(name, location, page=None):
     """Try to fetch the page corresponding to a query search with specified
     parameters. If there is no such page, or in case of error, None will be
@@ -30,8 +28,9 @@ def fetchPage(name, location, page=None):
 def findPageCount(name, location, logger):
     """
     This function queries and retrieves the number of pages of 11888.gr results
-    for the specific search parameters. If the parameters are faulty of lead to
+    for the specific search parameters. If the parameters are faulty or lead to
     no results, the page count is zero.
+
     - name: A string of the desired name to be searched.
     - location: A string of the desired name to be searched.
     """
@@ -70,7 +69,7 @@ def query(name, location, logger):
     This function queries the name dictionary of 11888.gr for a specific name, in
     a specific location. It returns a .json formatted dataset containing all
     sorts of information about the people that are being searched. Thus, the
-    returned data is could be considered as "raw data".
+    returned data could be considered as "raw data".
 
     - name: A string of the desired name to be searched.
     - location: A string of the desired name to be searched.
