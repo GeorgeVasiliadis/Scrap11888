@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from .Utils import purify
+from .Utils import purify, staticPath
 
 def cacheIn(dir, name, data):
     """
@@ -15,7 +15,7 @@ def cacheIn(dir, name, data):
     -data: python object to be cached.
     """
 
-    path = "cache"
+    path = staticPath(__file__, "cache")
     dir = purify(dir)
     name = purify(name)
     path = os.path.join(path, dir)
@@ -43,7 +43,7 @@ def cacheOut(dir, name):
 
     data = None
 
-    path = "cache"
+    path = staticPath(__file__, "cache")
     dir = purify(dir)
     name = purify(name)
     filename = name + ".pickle"

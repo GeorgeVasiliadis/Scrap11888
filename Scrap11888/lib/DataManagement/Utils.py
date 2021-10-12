@@ -1,3 +1,5 @@
+import os
+
 def purify(string):
     """
     This function simplifies the given string as much as possible and returns the
@@ -40,3 +42,8 @@ def purify(string):
                 pure = pure.replace(letter, dict[letter])
 
     return pure
+
+def staticPath(current, relativePath):
+    root_dir = os.path.dirname(current)
+    path = os.path.join(root_dir, relativePath)
+    return os.path.normpath(path)

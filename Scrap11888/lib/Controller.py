@@ -39,6 +39,9 @@ class Controller(threading.Thread):
                 # Cache the fetched, well-formatted data
                 Cacher.cacheIn(location, name, formatted_data)
 
+            else:
+                logger.log("Saved time by using cached data!", "info")
+
             # Filter out data if and only if user has supplied an address.
             # This statement could be omitted - it's used only for optimization.
             if address:

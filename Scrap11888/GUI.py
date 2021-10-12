@@ -1,4 +1,3 @@
-import os
 import threading
 
 import tkinter as tk
@@ -8,12 +7,8 @@ from tkinter import _tkinter
 
 from .lib import Controller
 from .lib.DataManagement import Importer
+from .lib.DataManagement.Utils import staticPath
 
-ROOT_DIR = os.path.dirname(__file__)
-
-def staticPath(relativePath):
-    path = os.path.join(ROOT_DIR, relativePath)
-    return os.path.normpath(path)
 
 class GUI(tk.Frame):
     """
@@ -47,7 +42,7 @@ class GUI(tk.Frame):
 
         # Other settings
         self.master.title("Scrap11888")
-        path = staticPath("res/icon.ico")
+        path = staticPath(__file__, "res/icon.ico")
         try:
             self.master.iconbitmap(path)
         except _tkinter.TclError:
@@ -151,7 +146,7 @@ class GUI(tk.Frame):
         """
 
         try:
-            path = staticPath("res/help_msg.txt")
+            path = staticPath(__file__, "res/help_msg.txt")
             with open(path, "r", encoding="utf-8") as f_in:
                 help_msg = f_in.read().strip()
             self.log(help_msg, "info")
