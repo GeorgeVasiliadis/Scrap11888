@@ -34,4 +34,4 @@ Auto-Resolved:
 ## Notes
 **GDPR:** All gathered data should be manually deleted within a month since scrap-day. Auto-deletion feature will soon be available.
 
-**Scrapping Ethics:** Scrapping is an automated process of data fetching, based on legal communication between user's computer and server of interest (11888). In order to achieve high speeds, Scrap11888 makes a considerable amount of parallel, frequent queries. This impacts server's resources, lowering its ability to respond to other users quickly as well. Thus, users are strongly recommended to respect target server by limiting their scrap-searches to just _a few per hour_.
+**Scraping Ethics:** Scraping is an automated process of data fetching, based on legal communication between user's computer and server of interest (11888). In order to achieve high speeds, Scrap11888 makes a considerable amount of parallel, frequent queries. This impacts server's resources, lowering its ability to respond to other users quickly as well. Thus, users are strongly recommended to respect target server by limiting their scrap-searches to just _a few per hour_.
