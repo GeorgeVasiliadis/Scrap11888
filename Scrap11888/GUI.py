@@ -2,7 +2,7 @@ import threading
 
 import tkinter as tk
 from tkinter import scrolledtext
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter import _tkinter
 
 from .lib import Controller
@@ -191,19 +191,24 @@ class GUI(tk.Frame):
                 self.log("Address can't contain numbers!", "error")
                 return
 
+        dirOut = self.chooseDirOut()
+
         # Clear entries only if the query is about to begin
         self.filename_entry.delete(0, "end")
         self.name_entry.delete(0, "end")
         self.location_entry.delete(0, "end")
         self.address_entry.delete(0, "end")
 
-        session = Controller.Controller(self, names, location, address)
+        session = Controller.Controller(self, names, location, address, dirOut)
         session.start()
 
     #TODO focus radio button
     def chooseFile(self, event):
         thread = threading.Thread(target=self.aux)
         thread.start()
+
+    def chooseDirOut(self):
+        return askdirectory(title="Choose Output Directory", mustexist=True)
 
     # Workaround to make file button get back up after being pressed.
     # Just ignore X(

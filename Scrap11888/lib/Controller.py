@@ -1,3 +1,4 @@
+import os
 import threading
 import concurrent.futures
 
@@ -11,7 +12,7 @@ class Controller(threading.Thread):
     may start more than one queries in parallel.
     """
 
-    def __init__(self, logger, names, location, address=""):
+    def __init__(self, logger, names, location, address="", dirOut=None):
         super().__init__()
         if len(names) > 1: self.multi = True
         else: self.multi = False
@@ -19,10 +20,10 @@ class Controller(threading.Thread):
         self.names = names
         self.location = location
         self.address = address
+        self.dirOut = dirOut
 
-    def thready(name, location, address, multi, logger):
+    def thready(dirOut, name, location, address, multi, logger):
         if name:
-
             # Try to find requested data in cache
             formatted_data = Cacher.cacheOut(location, name)
 
@@ -52,7 +53,7 @@ class Controller(threading.Thread):
                 logger.log("There are no results! No file will be generated!", "warning")
                 return
 
-            filename = defineFilename(name, location, address)
+            filename = defineFilename(dirOut, name, location, address)
 
             isExported = Exporter.exportToExcel(formatted_data, filename)
 
@@ -73,11 +74,11 @@ class Controller(threading.Thread):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=45) as executor:
             for name in self.names:
-                executor.submit(Controller.thready, name, self.location, self.address, self.multi, self.logger)
+                executor.submit(Controller.thready, self.dirOut, name, self.location, self.address, self.multi, self.logger)
 
         self.logger.log("DONE", "info")
 
-def defineFilename(name, location, address):
+def defineFilename(dirOut, name, location, address):
     filename = name + "_" + location
     if address: filename += "_" + address
-    return filename
+    return os.path.normpath(os.path.join(dirOut, filename))
