@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
         name="Scrap11888",
-        version="4.4",
+        version="4.5",
         description="A simple data scraping utility, used to extract data from 11888.gr",
         long_description=open("README.md", "r").read(),
         long_description_content_type="text/markdown",
