@@ -1,5 +1,4 @@
 *pycache*
-*.xlsx
 cache
 dist/
 *.egg-info/
