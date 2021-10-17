@@ -1,7 +1,7 @@
 # Scrap11888
 A simple data scraping utility, used to extract data from 11888.gr
 
-![Screenshot of Scrap11888](res/Scrap11888-Screenshot.PNG)
+![Screenshot of Scrap11888](https://github.com/GeorgeVasiliadis/Scrap11888/blob/b68cf99897dc6c92938917315d8d64a3dcc7831c/res/Scrap11888-Screenshot.PNG)
 
 ## Important Dependencies
 Manually-Resolved:
