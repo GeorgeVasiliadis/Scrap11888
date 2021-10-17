@@ -20,7 +20,7 @@ Auto-Resolved:
 - Search people by geographical location
 - Filter by address
 - Embedded caching system
-- Multithreading => Speed
+- Multithreading-Powered Speedups
 
 
 ## Quick Start
@@ -29,7 +29,7 @@ Auto-Resolved:
 2. On a terminal run `pip install Scrap11888`
 3. Run `scrap`
 
-> Just in case the script is not recognized (more likely in Linux systems), just import the package manually and run it. `python -c "import Scrap11888; Scrap11888.main()"` should do the trick.
+> Just in case the script is not recognized (more likely in Linux systems), just import the package manually and run it programmatically. Something like `python -c "import Scrap11888; Scrap11888.main()"` should do the trick.
 
 ## Notes
 **GDPR:** All gathered data should be manually deleted within a month since scrap-day. Auto-deletion feature will soon be available.
